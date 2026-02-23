@@ -1,0 +1,136 @@
+[
+  {
+    "id": 1,
+    "category": "single_service",
+    "query": "What's on my calendar next week?",
+    "expected_services": ["gcal"],
+    "expected_intent": "search_events",
+    "expected_output": "List of calendar events for the upcoming week with titles, times, and attendees."
+  },
+  {
+    "id": 2,
+    "category": "single_service",
+    "query": "Find emails from sarah@company.com about the budget",
+    "expected_services": ["gmail"],
+    "expected_intent": "search_emails",
+    "expected_output": "Emails from sarah@company.com containing 'budget' in subject or body, sorted by date."
+  },
+  {
+    "id": 3,
+    "category": "single_service",
+    "query": "Show me PDFs in Drive from last month",
+    "expected_services": ["drive"],
+    "expected_intent": "search_files",
+    "expected_output": "PDF files modified in the previous calendar month, with names and modification dates."
+  },
+  {
+    "id": 4,
+    "category": "multi_service",
+    "query": "Cancel my Turkish Airlines flight",
+    "expected_services": ["gmail", "gcal"],
+    "expected_intent": "cancel_flight",
+    "expected_steps": [
+      "Search Gmail for Turkish Airlines booking confirmation",
+      "Find related calendar event for the flight",
+      "Extract booking reference from email",
+      "Draft cancellation email to airline"
+    ],
+    "expected_output": "Found booking TK1234 in email. Found calendar event 'Istanbul -> NYC Flight'. Drafted cancellation email. Asks user for confirmation to send."
+  },
+  {
+    "id": 5,
+    "category": "multi_service",
+    "query": "Prepare for tomorrow's client meeting with Acme Corp",
+    "expected_services": ["gcal", "gmail", "drive"],
+    "expected_intent": "prepare_meeting",
+    "expected_steps": [
+      "Find tomorrow's calendar event with Acme Corp",
+      "Search emails with Acme Corp for context",
+      "Search Drive for Acme Corp documents"
+    ],
+    "expected_output": "Meeting details with time/attendees. Recent email threads with Acme. Relevant Drive documents (proposals, contracts). Compiled preparation summary."
+  },
+  {
+    "id": 6,
+    "category": "multi_service",
+    "query": "Find events next week that conflict with my out-of-office doc",
+    "expected_services": ["gcal", "drive"],
+    "expected_intent": "find_conflicts",
+    "expected_steps": [
+      "Search Drive for out-of-office document",
+      "Extract OOO dates from document",
+      "Search calendar for next week events",
+      "Cross-reference to find conflicts"
+    ],
+    "expected_output": "OOO dates identified from document. Conflicting calendar events listed with options to cancel or reschedule."
+  },
+  {
+    "id": 7,
+    "category": "single_service",
+    "query": "What's on my calendar next week where john@company.com is invited?",
+    "expected_services": ["gcal"],
+    "expected_intent": "search_events",
+    "expected_output": "Filtered list of next week's events where john@company.com is an attendee."
+  },
+  {
+    "id": 8,
+    "category": "ambiguous",
+    "query": "Move the meeting with John",
+    "expected_services": ["gcal"],
+    "expected_intent": "update_event",
+    "expected_ambiguities": [
+      "Which John? Multiple contacts may match.",
+      "When should the meeting be moved to?"
+    ],
+    "expected_output": "Clarification request: Which John? (lists possible matches). When would you like to reschedule?"
+  },
+  {
+    "id": 9,
+    "category": "ambiguous",
+    "query": "That email about the proposal",
+    "expected_services": ["gmail"],
+    "expected_intent": "search_emails",
+    "notes": "Requires conversation context to resolve 'that email'. Falls back to keyword search for 'proposal' if no context.",
+    "expected_output": "With context: the specific email referenced earlier. Without context: recent emails matching 'proposal'."
+  },
+  {
+    "id": 10,
+    "category": "edge_case",
+    "query": "Next Tuesday",
+    "expected_services": ["gcal"],
+    "expected_intent": "search_events",
+    "notes": "Temporal reasoning required. Must resolve 'Next Tuesday' to a concrete date in the user's timezone.",
+    "expected_output": "Calendar events for the resolved date of next Tuesday."
+  },
+  {
+    "id": 11,
+    "category": "single_service",
+    "query": "Draft an email to hr@company.com about my vacation request for March 15-22",
+    "expected_services": ["gmail"],
+    "expected_intent": "draft_email",
+    "expected_output": "Draft created with recipient hr@company.com, subject about vacation, body mentioning March 15-22 dates."
+  },
+  {
+    "id": 12,
+    "category": "multi_service",
+    "query": "Share the Q4 report with everyone in tomorrow's budget review meeting",
+    "expected_services": ["gcal", "drive"],
+    "expected_intent": "share_file",
+    "expected_steps": [
+      "Find tomorrow's 'budget review' calendar event",
+      "Extract attendee emails from the event",
+      "Search Drive for 'Q4 report'",
+      "Share the file with all attendees"
+    ],
+    "expected_output": "Found the meeting, identified attendees, located Q4 report in Drive, shared with all attendees."
+  },
+  {
+    "id": 13,
+    "category": "edge_case",
+    "query": "Delete all my meetings for today",
+    "expected_services": ["gcal"],
+    "expected_intent": "delete_events",
+    "notes": "Destructive operation - should require confirmation before deleting multiple events.",
+    "expected_output": "Lists today's events and asks for explicit confirmation before deletion."
+  }
+]
