@@ -89,7 +89,11 @@ async def test_agent_retry_on_server_error(gmail_agent):
         return httpx.Response(200, request=request, json={"messages": []})
 
     with patch("httpx.AsyncClient.send", new=mock_send), \
-         patch("asyncio.sleep", new_callable=AsyncMock):
+         patch("asyncio.sleep", new_callable=AsyncMock), \
+         patch("app.agents.base.settings") as mock_settings:
+        mock_settings.demo_mode = False
+        mock_settings.google_api_retry_attempts = 3
+        mock_settings.google_api_retry_base_delay = 0.0
         result = await gmail_agent._api_search("test")
         assert call_count == 3
 

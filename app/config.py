@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     intent_cache_ttl: int = 300
     conversation_context_ttl: int = 1800
 
+    demo_mode: bool = False
     debug: bool = False
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}

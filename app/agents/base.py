@@ -36,6 +36,11 @@ class BaseAgent(ABC):
         json_body: dict | None = None,
     ) -> dict:
         """Make an HTTP request to Google API with retry + exponential backoff."""
+        if settings.demo_mode:
+            from app.agents.mock_data import route_mock_request
+            logger.debug("DEMO: %s %s params=%s", method, url, params)
+            return route_mock_request(method, url, params=params, json_body=json_body)
+
         last_exc: Exception | None = None
         for attempt in range(settings.google_api_retry_attempts):
             try:
@@ -53,6 +58,8 @@ class BaseAgent(ABC):
                         await asyncio.sleep(delay)
                         continue
                     resp.raise_for_status()
+                    if resp.status_code == 204 or not resp.content:
+                        return {}
                     return resp.json()
             except httpx.HTTPStatusError as e:
                 last_exc = e

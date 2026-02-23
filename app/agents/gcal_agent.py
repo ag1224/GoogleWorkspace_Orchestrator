@@ -152,12 +152,5 @@ class GCalAgent(BaseAgent):
         return {"event_id": data["id"], "status": "updated"}
 
     async def delete_event(self, event_id: str, **kwargs) -> dict:
-        import httpx as _httpx
-
-        async with _httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.delete(
-                f"{GCAL_API}/calendars/primary/events/{event_id}",
-                headers=self._headers(),
-            )
-            resp.raise_for_status()
+        await self._request("DELETE", f"{GCAL_API}/calendars/primary/events/{event_id}")
         return {"event_id": event_id, "status": "deleted"}
