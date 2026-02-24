@@ -5,10 +5,9 @@ import math
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import text, select
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.cache import GmailCache, GCalCache, GDriveCache
 from app.services.embedding import generate_embedding
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ async def hybrid_search_emails(
 
     sql = """
         SELECT id, email_id, subject, sender, recipients, body_preview, received_at,
-               1 - (embedding <=> :embedding::vector) AS similarity
+               1 - (embedding <=> CAST(:embedding AS vector)) AS similarity
         FROM gmail_cache
         WHERE user_id = :user_id AND embedding IS NOT NULL
     """
@@ -49,7 +48,7 @@ async def hybrid_search_emails(
         sql += " AND received_at <= :date_to"
         params["date_to"] = date_to
 
-    sql += " ORDER BY embedding <=> :embedding::vector LIMIT :limit"
+    sql += " ORDER BY embedding <=> CAST(:embedding AS vector) LIMIT :limit"
     params["limit"] = limit
 
     result = await db.execute(text(sql), params)
@@ -88,7 +87,7 @@ async def hybrid_search_events(
 
     sql = """
         SELECT id, event_id, title, description, start_time, end_time, attendees, location,
-               1 - (embedding <=> :embedding::vector) AS similarity
+               1 - (embedding <=> CAST(:embedding AS vector)) AS similarity
         FROM gcal_cache
         WHERE user_id = :user_id AND embedding IS NOT NULL
     """
@@ -101,7 +100,7 @@ async def hybrid_search_events(
         sql += " AND end_time <= :date_to"
         params["date_to"] = date_to
 
-    sql += " ORDER BY embedding <=> :embedding::vector LIMIT :limit"
+    sql += " ORDER BY embedding <=> CAST(:embedding AS vector) LIMIT :limit"
     params["limit"] = limit
 
     result = await db.execute(text(sql), params)
@@ -144,7 +143,7 @@ async def hybrid_search_files(
 
     sql = """
         SELECT id, file_id, name, mime_type, content_preview, modified_at,
-               1 - (embedding <=> :embedding::vector) AS similarity
+               1 - (embedding <=> CAST(:embedding AS vector)) AS similarity
         FROM gdrive_cache
         WHERE user_id = :user_id AND embedding IS NOT NULL
     """
@@ -160,7 +159,7 @@ async def hybrid_search_files(
         sql += " AND modified_at <= :date_to"
         params["date_to"] = date_to
 
-    sql += " ORDER BY embedding <=> :embedding::vector LIMIT :limit"
+    sql += " ORDER BY embedding <=> CAST(:embedding AS vector) LIMIT :limit"
     params["limit"] = limit
 
     result = await db.execute(text(sql), params)
